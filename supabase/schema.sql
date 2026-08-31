@@ -45,7 +45,7 @@ create table if not exists education (
   created_at timestamptz not null default now()
 );
 
--- ---------- WORK HISTORY (nghề từng làm) ----------
+-- ---------- WORK HISTORY (công việc) ----------
 create table if not exists work_history (
   id uuid primary key default gen_random_uuid(),
   company text not null,
@@ -54,9 +54,17 @@ create table if not exists work_history (
   end_date date,
   is_current boolean not null default false,
   description text,
+  image_url text,
+  video_url text,
+  display_layout text not null default 'timeline',
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- Bổ sung cột media/bố trí khi nâng cấp database đã tạo từ phiên bản cũ.
+alter table work_history add column if not exists image_url text;
+alter table work_history add column if not exists video_url text;
+alter table work_history add column if not exists display_layout text not null default 'timeline';
 
 -- ---------- EXPERIENCE / SKILLS (kinh nghiệm) ----------
 create table if not exists experience (
@@ -182,3 +190,7 @@ drop policy if exists "cv-media auth delete" on storage.objects;
 create policy "cv-media auth delete"
   on storage.objects for delete
   using (bucket_id = 'cv-media' and auth.role() = 'authenticated');
+
+-- Yêu cầu PostgREST nạp lại cấu trúc bảng ngay sau khi migration hoàn tất.
+-- Tránh lỗi "Could not find ... column in the schema cache" trên ứng dụng.
+notify pgrst, 'reload schema';

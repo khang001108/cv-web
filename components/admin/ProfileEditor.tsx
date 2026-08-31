@@ -110,7 +110,10 @@ export default function ProfileEditor() {
     if (!profile) return;
     const { error } = await supabase.from("profile").update(profile).eq("id", 1);
     if (error) {
-      alert(`Không thể lưu hồ sơ: ${error.message}`);
+      const schemaHint = error.message.includes("schema cache")
+        ? "\nHãy chạy lại file supabase/schema.sql trong đúng project Supabase rồi tải lại trang."
+        : "";
+      alert(`Không thể lưu hồ sơ: ${error.message}${schemaHint}`);
       return;
     }
     setSaved(true);

@@ -10,7 +10,7 @@ import ProductsEditor from "@/components/admin/ProductsEditor";
 
 const TABS = [
   { key: "profile", label: "Hồ sơ", Component: ProfileEditor },
-  { key: "work", label: "Nghề từng làm", Component: WorkEditor },
+  { key: "work", label: "Công việc", Component: WorkEditor },
   { key: "education", label: "Học lực", Component: EducationEditor },
   { key: "experience", label: "Kinh nghiệm", Component: ExperienceEditor },
   { key: "products", label: "Sản phẩm", Component: ProductsEditor },

@@ -1,7 +1,7 @@
 # CV Online
 
 Trang CV cá nhân: Next.js 14 + Supabase, deploy bằng Vercel. Có trang admin
-đăng nhập để tự cập nhật mô tả bản thân, học lực, nghề từng làm, kinh nghiệm,
+đăng nhập để tự cập nhật mô tả bản thân, học lực, công việc, kinh nghiệm,
 mức lương, và sản phẩm tự làm (kèm ảnh, video ngắn, link).
 
 ## 1. Tạo dự án Supabase
@@ -41,8 +41,8 @@ npm run dev
   tạo ở bước 1.3)
 
 Vào `/admin` để nhập nội dung: hồ sơ, ảnh đại diện, ảnh nền, bảng màu, bối cảnh,
-mạng xã hội, học lực, nghề từng làm, kinh nghiệm, sản phẩm (upload ảnh + video
-ngắn cho từng sản phẩm, gắn link), mức lương từng có.
+mạng xã hội, học lực, công việc (ảnh, video, bố trí hiển thị), kinh nghiệm,
+sản phẩm (upload ảnh + video ngắn cho từng sản phẩm, gắn link), mức lương từng có.
 
 ## 4. Deploy lên Vercel
 
@@ -59,7 +59,7 @@ ngắn cho từng sản phẩm, gắn link), mức lương từng có.
 |---|---|
 | `profile` | Mô tả bản thân, avatar, liên hệ, mạng xã hội |
 | `education` | Học lực |
-| `work_history` | Nghề từng làm |
+| `work_history` | Công việc, mô tả, ảnh/video và bố trí hiển thị |
 | `experience` | Kinh nghiệm / kỹ năng |
 | `salary_history` | Mức lương từng có |
 | `products` | Sản phẩm tự làm (ảnh, video, link, tag) |

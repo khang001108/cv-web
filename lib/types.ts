@@ -17,6 +17,12 @@ export type ThemeName = "coral" | "ocean" | "forest" | "sunset";
 
 export type BackgroundStyle = "aurora" | "grid" | "spotlight" | "minimal";
 
+export type WorkDisplayLayout =
+  | "timeline"
+  | "media-left"
+  | "media-right"
+  | "media-top";
+
 export type Social = {
   label: string;
   url: string;
@@ -58,6 +64,9 @@ export type WorkHistory = {
   end_date: string | null;
   is_current: boolean;
   description: string | null;
+  image_url: string | null;
+  video_url: string | null;
+  display_layout: WorkDisplayLayout;
   sort_order: number;
 };
 

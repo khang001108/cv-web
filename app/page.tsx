@@ -5,6 +5,7 @@ import { Timeline, formatRange } from "@/components/site/Timeline";
 import Skills from "@/components/site/Skills";
 import SalaryHistoryList from "@/components/site/SalaryHistory";
 import Products from "@/components/site/Products";
+import WorkHistoryList from "@/components/site/WorkHistoryList";
 import type {
   Profile,
   Education,
@@ -55,16 +56,8 @@ export default async function Home() {
       <Hero profile={profile} />
 
       {work.length > 0 && (
-        <Section id="work" title="Nghề từng làm" kicker="Hành trình sự nghiệp">
-          <Timeline
-            entries={work.map((w) => ({
-              id: w.id,
-              title: w.position,
-              subtitle: w.company,
-              range: formatRange(w.start_date, w.end_date, w.is_current),
-              description: w.description,
-            }))}
-          />
+        <Section id="work" title="Công việc" kicker="Hành trình sự nghiệp">
+          <WorkHistoryList items={work} />
         </Section>
       )}
 

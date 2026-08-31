@@ -29,7 +29,7 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
             {e.subtitle}
           </p>
           {e.description && (
-            <p className="mt-2 max-w-xl font-body text-sm leading-relaxed text-muted">
+            <p className="mt-2 max-w-xl whitespace-pre-line font-body text-sm leading-relaxed text-muted">
               {e.description}
             </p>
           )}

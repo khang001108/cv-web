@@ -2,53 +2,132 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { WorkHistory } from "@/lib/types";
+import { uploadToCvMedia } from "@/lib/upload";
+import type { WorkDisplayLayout, WorkHistory } from "@/lib/types";
 import { Field, inputClass, Card, IconButton } from "./ui";
 
+const WORK_LAYOUTS: Array<{ value: WorkDisplayLayout; label: string }> = [
+  { value: "timeline", label: "Dòng thời gian" },
+  { value: "media-left", label: "Ảnh/video bên trái" },
+  { value: "media-right", label: "Ảnh/video bên phải" },
+  { value: "media-top", label: "Ảnh/video phía trên" },
+];
+
 export default function WorkEditor() {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const [items, setItems] = useState<WorkHistory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState<string | null>(null);
+  const [savedId, setSavedId] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase
-      .from("work_history")
-      .select("*")
-      .order("sort_order")
-      .then(({ data }) => {
-        setItems((data as WorkHistory[]) ?? []);
-        setLoading(false);
-      });
-  }, []);
+    let cancelled = false;
+
+    async function loadWork() {
+      const { data, error } = await supabase
+        .from("work_history")
+        .select("*")
+        .order("sort_order");
+
+      if (cancelled) return;
+      if (error) setLoadError(error.message);
+      else setItems((data as WorkHistory[]) ?? []);
+      setLoading(false);
+    }
+
+    void loadWork();
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase]);
 
   function update(id: string, patch: Partial<WorkHistory>) {
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)));
+    setSavedId((current) => (current === id ? null : current));
   }
 
   async function save(item: WorkHistory) {
-    await supabase.from("work_history").update(item).eq("id", item.id);
+    const { error } = await supabase.from("work_history").update(item).eq("id", item.id);
+    if (error) {
+      alert(`Không thể lưu công việc: ${error.message}`);
+      return;
+    }
+    setSavedId(item.id);
   }
 
   async function addNew() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("work_history")
-      .insert({ company: "Công ty mới", position: "Vị trí", sort_order: items.length })
+      .insert({
+        company: "Công ty mới",
+        position: "Vị trí",
+        display_layout: "timeline",
+        sort_order: items.length,
+      })
       .select()
       .single();
+
+    if (error) {
+      alert(`Không thể thêm công việc: ${error.message}`);
+      return;
+    }
     if (data) setItems((prev) => [...prev, data as WorkHistory]);
   }
 
   async function remove(id: string) {
-    await supabase.from("work_history").delete().eq("id", id);
-    setItems((prev) => prev.filter((i) => i.id !== id));
+    if (!window.confirm("Xóa công việc này?")) return;
+    const { error } = await supabase.from("work_history").delete().eq("id", id);
+    if (error) {
+      alert(`Không thể xóa công việc: ${error.message}`);
+      return;
+    }
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  }
+
+  async function handleUpload(
+    id: string,
+    field: "image_url" | "video_url",
+    file: File | undefined
+  ) {
+    if (!file) return;
+    const uploadKey = `${id}:${field}`;
+    setUploading(uploadKey);
+    try {
+      const folder = field === "image_url" ? "work-images" : "work-videos";
+      const url = await uploadToCvMedia(file, folder);
+      update(id, { [field]: url } as Partial<WorkHistory>);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Lỗi không xác định";
+      alert(`Tải tệp thất bại: ${message}`);
+    } finally {
+      setUploading(null);
+    }
   }
 
   if (loading) return <p className="font-body text-sm text-muted">Đang tải...</p>;
 
+  if (loadError)
+    return (
+      <div className="rounded-xl border border-coral/30 bg-coral/5 p-4 font-body text-sm text-ink">
+        <p className="font-medium">Không thể tải danh sách công việc.</p>
+        <p className="mt-1 text-muted">{loadError}</p>
+      </div>
+    );
+
   return (
     <div className="flex flex-col gap-4">
-      {items.map((item) => (
+      {items.map((item, index) => (
         <Card key={item.id}>
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-medium text-ink">
+              Công việc {index + 1}
+            </h2>
+            {savedId === item.id && (
+              <span className="font-body text-xs text-teal">Đã lưu ✓</span>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Công ty">
               <input
@@ -57,7 +136,7 @@ export default function WorkEditor() {
                 onChange={(e) => update(item.id, { company: e.target.value })}
               />
             </Field>
-            <Field label="Vị trí / Nghề">
+            <Field label="Vị trí / Công việc">
               <input
                 className={inputClass}
                 value={item.position}
@@ -86,28 +165,118 @@ export default function WorkEditor() {
                 type="number"
                 className={inputClass}
                 value={item.sort_order}
-                onChange={(e) =>
-                  update(item.id, { sort_order: Number(e.target.value) })
-                }
+                onChange={(e) => update(item.id, { sort_order: Number(e.target.value) })}
               />
             </Field>
-            <label className="flex items-center gap-2 pt-5">
+            <Field label="Bố trí hiển thị">
+              <select
+                className={inputClass}
+                value={item.display_layout ?? "timeline"}
+                onChange={(e) =>
+                  update(item.id, {
+                    display_layout: e.target.value as WorkDisplayLayout,
+                  })
+                }
+              >
+                {WORK_LAYOUTS.map((layout) => (
+                  <option key={layout.value} value={layout.value}>
+                    {layout.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <label className="flex items-center gap-2 sm:col-span-2">
               <input
                 type="checkbox"
                 checked={item.is_current}
-                onChange={(e) => update(item.id, { is_current: e.target.checked })}
+                onChange={(e) =>
+                  update(item.id, {
+                    is_current: e.target.checked,
+                    end_date: e.target.checked ? null : item.end_date,
+                  })
+                }
               />
               <span className="font-body text-sm text-ink">Đang làm việc</span>
             </label>
           </div>
+
           <Field label="Mô tả công việc">
             <textarea
               className={inputClass}
-              rows={2}
+              rows={5}
               value={item.description ?? ""}
+              placeholder="Mỗi ý có thể nằm trên một dòng riêng..."
               onChange={(e) => update(item.id, { description: e.target.value })}
             />
+            <span className="font-body text-[11px] text-muted">
+              Nhấn Enter hoặc Shift + Enter để xuống dòng; trang CV sẽ giữ nguyên cách xuống dòng.
+            </span>
           </Field>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Ảnh công việc">
+              <div className="flex flex-col gap-2 rounded-xl border border-ink/10 p-3">
+                {item.image_url && (
+                  <img
+                    src={item.image_url}
+                    alt="Ảnh công việc"
+                    className="aspect-video w-full rounded-lg object-cover"
+                  />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    handleUpload(item.id, "image_url", e.target.files?.[0])
+                  }
+                  className="font-body text-xs"
+                />
+                {uploading === `${item.id}:image_url` && (
+                  <span className="font-body text-xs text-muted">Đang tải ảnh...</span>
+                )}
+                {item.image_url && (
+                  <IconButton onClick={() => update(item.id, { image_url: null })}>
+                    Bỏ ảnh
+                  </IconButton>
+                )}
+              </div>
+            </Field>
+
+            <Field label="Video công việc">
+              <div className="flex flex-col gap-2 rounded-xl border border-ink/10 p-3">
+                {item.video_url && (
+                  <video
+                    src={item.video_url}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="aspect-video w-full rounded-lg bg-ink object-cover"
+                  />
+                )}
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) =>
+                    handleUpload(item.id, "video_url", e.target.files?.[0])
+                  }
+                  className="font-body text-xs"
+                />
+                {uploading === `${item.id}:video_url` && (
+                  <span className="font-body text-xs text-muted">Đang tải video...</span>
+                )}
+                {item.video_url && (
+                  <IconButton onClick={() => update(item.id, { video_url: null })}>
+                    Bỏ video
+                  </IconButton>
+                )}
+              </div>
+            </Field>
+          </div>
+
+          <p className="font-body text-[11px] text-muted">
+            Sau khi tải ảnh/video hoặc đổi bố trí, bấm Lưu để cập nhật trang CV.
+          </p>
+
           <div className="flex justify-end gap-2">
             <IconButton variant="danger" onClick={() => remove(item.id)}>
               Xóa
