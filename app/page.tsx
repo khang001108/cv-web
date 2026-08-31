@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { unstable_noStore as noStore } from "next/cache";
 import Hero from "@/components/site/Hero";
 import Section from "@/components/site/Section";
 import { Timeline, formatRange } from "@/components/site/Timeline";
@@ -7,6 +8,7 @@ import SalaryHistoryList from "@/components/site/SalaryHistory";
 import Products from "@/components/site/Products";
 import WorkHistoryList from "@/components/site/WorkHistoryList";
 import SiteSidebar from "@/components/site/SiteSidebar";
+import SiteTabs from "@/components/site/SiteTabs";
 import type {
   Profile,
   Education,
@@ -19,6 +21,7 @@ import type {
 export const revalidate = 0;
 
 export default async function Home() {
+  noStore();
   const supabase = await createClient();
 
   const [profileRes, educationRes, workRes, experienceRes, salaryRes, productsRes] =
@@ -70,6 +73,7 @@ export default async function Home() {
         <SiteSidebar profile={profile} sections={visibleSections} />
         <div className="page-content min-w-0">
           <Hero profile={profile} />
+          <SiteTabs sections={["top", ...visibleSections]} />
           <div className="sections-grid">
 
             {work.length > 0 && (

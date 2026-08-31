@@ -128,6 +128,79 @@ body {
   display: none;
 }
 
+.site-tabs {
+  display: none;
+}
+
+[data-layout="tabs"] .hero-inner {
+  max-width: 64rem;
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
+}
+
+[data-layout="tabs"] .site-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding: 1rem max(1rem, calc((100vw - 64rem) / 2));
+  border-bottom: 1px solid rgb(var(--color-ink) / 0.1);
+  background: rgb(var(--color-paper) / 0.92);
+  backdrop-filter: blur(16px);
+  scrollbar-width: none;
+}
+
+[data-layout="tabs"] .site-tabs::-webkit-scrollbar,
+[data-layout="tabs"] .sections-grid::-webkit-scrollbar {
+  display: none;
+}
+
+[data-layout="tabs"] .site-tabs button {
+  flex: 0 0 auto;
+  padding: 0.65rem 1.25rem;
+  border: 1px solid rgb(var(--color-ink) / 0.14);
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(var(--color-ink));
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: 160ms ease;
+}
+
+[data-layout="tabs"] .site-tabs button:hover {
+  border-color: rgb(var(--color-ink) / 0.35);
+}
+
+[data-layout="tabs"] .site-tabs button.is-active {
+  border-color: rgb(var(--color-ink));
+  background: rgb(var(--color-ink));
+  color: rgb(var(--color-paper));
+}
+
+[data-layout="tabs"] .sections-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  align-items: start;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+[data-layout="tabs"] .page-section {
+  width: 100%;
+  max-width: 64rem;
+  min-height: 32rem;
+  scroll-margin-top: 5rem;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
 [data-layout="dashboard"] .site-shell,
 [data-layout="resume"] .site-shell {
   display: grid;

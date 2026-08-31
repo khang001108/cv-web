@@ -23,7 +23,8 @@ export type PageLayout =
   | "compact"
   | "cards"
   | "dashboard"
-  | "resume";
+  | "resume"
+  | "tabs";
 
 export type MediaItem = {
   id: string;
