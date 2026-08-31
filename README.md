@@ -10,8 +10,9 @@ mức lương, và sản phẩm tự làm (kèm ảnh, video ngắn, link).
 2. Vào **SQL Editor** → dán toàn bộ nội dung file `supabase/schema.sql` → **Run**.
    Việc này tạo các bảng (`profile`, `education`, `work_history`, `experience`,
    `salary_history`, `products`), bật Row Level Security (ai cũng đọc được,
-   chỉ tài khoản đăng nhập mới sửa), và tạo storage bucket `cv-media` cho
-   ảnh/video.
+   chỉ tài khoản đăng nhập mới sửa), cấp quyền API cần thiết, và tạo storage
+   bucket `cv-media` cho ảnh/video. Có thể chạy lại file này an toàn nếu schema
+   đã được tạo từ trước.
 3. Vào **Authentication → Users → Add user** để tạo tài khoản admin cho
    chính bạn (email + mật khẩu). Đây là tài khoản bạn sẽ dùng để đăng nhập
    trang `/admin`.

@@ -88,6 +88,38 @@ create table if not exists products (
   created_at timestamptz not null default now()
 );
 
+-- ---------- API GRANTS ----------
+-- RLS policies only filter rows; the API roles also need table privileges.
+-- Keep public visitors read-only and allow signed-in users to manage CV data.
+grant usage on schema public to anon, authenticated;
+
+revoke all on table
+  profile,
+  education,
+  work_history,
+  experience,
+  salary_history,
+  products
+from anon, authenticated;
+
+grant select on table
+  profile,
+  education,
+  work_history,
+  experience,
+  salary_history,
+  products
+to anon;
+
+grant select, insert, update, delete on table
+  profile,
+  education,
+  work_history,
+  experience,
+  salary_history,
+  products
+to authenticated;
+
 -- ============================================================
 -- Row Level Security: ai cũng đọc được (public CV), chỉ tài
 -- khoản đăng nhập (chính bạn) mới sửa được.

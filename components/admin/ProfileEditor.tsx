@@ -7,23 +7,44 @@ import type { Profile, Social } from "@/lib/types";
 import { Field, inputClass, Card, IconButton } from "./ui";
 
 export default function ProfileEditor() {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    supabase
-      .from("profile")
-      .select("*")
-      .eq("id", 1)
-      .maybeSingle()
-      .then(({ data }) => {
+    let cancelled = false;
+
+    async function loadProfile() {
+      const { data, error } = await supabase
+        .from("profile")
+        .select("*")
+        .eq("id", 1)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      if (error) {
+        setLoadError(error.message);
+      } else if (!data) {
+        setLoadError(
+          "Không tìm thấy hồ sơ. Hãy chạy lại file supabase/schema.sql trong Supabase SQL Editor."
+        );
+      } else {
         setProfile(data as Profile);
-        setLoading(false);
-      });
-  }, []);
+      }
+
+      setLoading(false);
+    }
+
+    void loadProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase]);
 
   function update(patch: Partial<Profile>) {
     setProfile((prev) => (prev ? { ...prev, ...patch } : prev));
@@ -62,12 +83,24 @@ export default function ProfileEditor() {
 
   async function save() {
     if (!profile) return;
-    await supabase.from("profile").update(profile).eq("id", 1);
+    const { error } = await supabase.from("profile").update(profile).eq("id", 1);
+    if (error) {
+      alert(`Không thể lưu hồ sơ: ${error.message}`);
+      return;
+    }
     setSaved(true);
   }
 
-  if (loading || !profile)
+  if (loading)
     return <p className="font-body text-sm text-muted">Đang tải...</p>;
+
+  if (loadError || !profile)
+    return (
+      <div className="rounded-xl border border-coral/30 bg-coral/5 p-4 font-body text-sm text-ink">
+        <p className="font-medium">Không thể tải hồ sơ từ Supabase.</p>
+        <p className="mt-1 text-muted">{loadError}</p>
+      </div>
+    );
 
   return (
     <Card>
