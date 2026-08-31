@@ -55,6 +55,8 @@ export const PAGE_LAYOUT_OPTIONS: Array<{
   { value: "wide", label: "Toàn cảnh", description: "Khung rộng, hợp với nhiều media" },
   { value: "compact", label: "Gọn gàng", description: "Thu hẹp khoảng cách giữa các mục" },
   { value: "cards", label: "Thẻ nổi", description: "Mỗi mục nằm trong một thẻ riêng" },
+  { value: "dashboard", label: "Dashboard", description: "Sidebar cố định và nội dung dạng lưới" },
+  { value: "resume", label: "CV hai cột", description: "Hồ sơ bên trái, nội dung bên phải" },
 ];
 
 const LABEL_TO_PLATFORM: Record<string, SocialPlatform> = {

@@ -41,9 +41,9 @@ npm run dev
   tạo ở bước 1.3)
 
 Vào `/admin` để nhập nội dung: hồ sơ, ảnh đại diện, ảnh nền, bảng màu, bối cảnh,
-bố cục toàn trang, mạng xã hội, học lực, công việc, kinh nghiệm, sản phẩm và mức
-lương từng có. Mỗi mục nội dung có thể upload nhiều ảnh/video; riêng từng công
-việc còn có lựa chọn bố trí media riêng.
+bố cục toàn trang (gồm Dashboard có sidebar và CV hai cột), mạng xã hội, học lực,
+công việc, kinh nghiệm, sản phẩm và mức lương từng có. Mỗi mục nội dung có thể
+upload nhiều ảnh/video; riêng từng công việc còn có lựa chọn bố trí media riêng.
 
 ## 4. Deploy lên Vercel
 

@@ -10,7 +10,10 @@ export default function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="page-section mx-auto max-w-3xl px-6 py-16">
+    <section
+      id={id}
+      className={`page-section section-${id} mx-auto max-w-3xl px-6 py-16`}
+    >
       <div className="mb-8">
         {kicker && (
           <p className="font-body text-sm text-muted">{kicker}</p>

@@ -23,7 +23,8 @@ export default function Hero({ profile }: { profile: Profile }) {
 
   return (
     <section
-      className="relative overflow-hidden bg-ink bg-cover bg-center text-paper"
+      id="top"
+      className="hero-section relative overflow-hidden bg-ink bg-cover bg-center text-paper"
       style={
         profile.background_url
           ? { backgroundImage: `url(${JSON.stringify(profile.background_url)})` }

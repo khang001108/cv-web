@@ -17,7 +17,13 @@ export type ThemeName = "coral" | "ocean" | "forest" | "sunset";
 
 export type BackgroundStyle = "aurora" | "grid" | "spotlight" | "minimal";
 
-export type PageLayout = "classic" | "wide" | "compact" | "cards";
+export type PageLayout =
+  | "classic"
+  | "wide"
+  | "compact"
+  | "cards"
+  | "dashboard"
+  | "resume";
 
 export type MediaItem = {
   id: string;
