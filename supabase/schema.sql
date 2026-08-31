@@ -12,6 +12,9 @@ create table if not exists profile (
   headline text not null default '',
   bio text not null default '',
   avatar_url text,
+  background_url text,
+  theme text not null default 'coral',
+  background_style text not null default 'aurora',
   email text,
   phone text,
   location text,
@@ -19,6 +22,11 @@ create table if not exists profile (
   updated_at timestamptz not null default now(),
   constraint profile_singleton check (id = 1)
 );
+
+-- Bổ sung cột khi nâng cấp một database đã tạo từ phiên bản cũ.
+alter table profile add column if not exists background_url text;
+alter table profile add column if not exists theme text not null default 'coral';
+alter table profile add column if not exists background_style text not null default 'aurora';
 
 insert into profile (id, full_name, headline, bio)
 values (1, 'Tên của bạn', 'Web Developer & Manufacturing Engineer', 'Viết mô tả bản thân ở đây.')

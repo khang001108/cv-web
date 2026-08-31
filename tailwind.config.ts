@@ -9,12 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#12131A",
-        paper: "#F5F3FF",
-        muted: "#6B6880",
-        coral: "#FF4D6D",
-        teal: "#14C7A5",
-        amber: "#FFC145",
+        ink: "rgb(var(--color-ink) / <alpha-value>)",
+        paper: "rgb(var(--color-paper) / <alpha-value>)",
+        muted: "rgb(var(--color-muted) / <alpha-value>)",
+        coral: "rgb(var(--color-accent) / <alpha-value>)",
+        teal: "rgb(var(--color-secondary) / <alpha-value>)",
+        amber: "rgb(var(--color-highlight) / <alpha-value>)",
       },
       fontFamily: {
         display: ["var(--font-display)", "sans-serif"],

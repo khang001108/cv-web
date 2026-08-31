@@ -1,4 +1,27 @@
-export type Social = { label: string; url: string };
+export type SocialPlatform =
+  | "facebook"
+  | "zalo"
+  | "telegram"
+  | "instagram"
+  | "whatsapp"
+  | "linkedin"
+  | "github"
+  | "youtube"
+  | "tiktok"
+  | "website"
+  | "phone"
+  | "email"
+  | "custom";
+
+export type ThemeName = "coral" | "ocean" | "forest" | "sunset";
+
+export type BackgroundStyle = "aurora" | "grid" | "spotlight" | "minimal";
+
+export type Social = {
+  label: string;
+  url: string;
+  platform?: SocialPlatform;
+};
 
 export type Profile = {
   id: number;
@@ -6,6 +29,9 @@ export type Profile = {
   headline: string;
   bio: string;
   avatar_url: string | null;
+  background_url: string | null;
+  theme: ThemeName;
+  background_style: BackgroundStyle;
   email: string | null;
   phone: string | null;
   location: string | null;

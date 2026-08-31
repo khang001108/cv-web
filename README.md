@@ -40,9 +40,9 @@ npm run dev
 - Trang quản trị: http://localhost:3000/admin (đăng nhập bằng tài khoản đã
   tạo ở bước 1.3)
 
-Vào `/admin` để nhập nội dung: hồ sơ, học lực, nghề từng làm, kinh nghiệm,
-sản phẩm (upload ảnh + video ngắn cho từng sản phẩm, gắn link), mức lương
-từng có.
+Vào `/admin` để nhập nội dung: hồ sơ, ảnh đại diện, ảnh nền, bảng màu, bối cảnh,
+mạng xã hội, học lực, nghề từng làm, kinh nghiệm, sản phẩm (upload ảnh + video
+ngắn cho từng sản phẩm, gắn link), mức lương từng có.
 
 ## 4. Deploy lên Vercel
 

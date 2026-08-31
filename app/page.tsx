@@ -35,6 +35,9 @@ export default async function Home() {
     headline: "",
     bio: "",
     avatar_url: null,
+    background_url: null,
+    theme: "coral",
+    background_style: "aurora",
     email: null,
     phone: null,
     location: null,
@@ -48,7 +51,7 @@ export default async function Home() {
   const products = (productsRes.data as Product[]) ?? [];
 
   return (
-    <main className="bg-paper">
+    <main data-theme={profile.theme ?? "coral"} className="bg-paper">
       <Hero profile={profile} />
 
       {work.length > 0 && (

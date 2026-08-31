@@ -3,6 +3,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import type { Profile } from "@/lib/types";
+import { inferSocialPlatform, socialHref, socialLabel } from "@/lib/profile-options";
+import SocialIcon from "./SocialIcon";
 
 export default function Hero({ profile }: { profile: Profile }) {
   const roles = profile.headline
@@ -11,6 +13,7 @@ export default function Hero({ profile }: { profile: Profile }) {
     .filter(Boolean);
   const words = roles.length > 0 ? roles : [profile.headline];
   const [index, setIndex] = useState(0);
+  const backgroundStyle = profile.background_style ?? "aurora";
 
   useEffect(() => {
     if (words.length < 2) return;
@@ -19,27 +22,50 @@ export default function Hero({ profile }: { profile: Profile }) {
   }, [words.length]);
 
   return (
-    <section className="relative overflow-hidden bg-ink text-paper">
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -right-40 -top-40 h-[32rem] w-[32rem] rounded-full blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle at 30% 30%, #FF4D6D 0%, #FF4D6D00 70%)",
-        }}
-        animate={{ rotate: [0, 30, -10, 0], scale: [1, 1.15, 0.95, 1] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -left-32 bottom-[-10rem] h-[26rem] w-[26rem] rounded-full blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle at 60% 40%, #14C7A5 0%, #14C7A500 70%)",
-        }}
-        animate={{ rotate: [0, -20, 15, 0], scale: [1, 0.9, 1.1, 1] }}
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-      />
+    <section
+      className="relative overflow-hidden bg-ink bg-cover bg-center text-paper"
+      style={
+        profile.background_url
+          ? { backgroundImage: `url(${JSON.stringify(profile.background_url)})` }
+          : undefined
+      }
+    >
+      {profile.background_url && (
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-ink/75" />
+      )}
+
+      {backgroundStyle === "aurora" && (
+        <>
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -right-40 -top-40 h-[32rem] w-[32rem] rounded-full blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle at 30% 30%, rgb(var(--color-accent)) 0%, transparent 70%)",
+            }}
+            animate={{ rotate: [0, 30, -10, 0], scale: [1, 1.15, 0.95, 1] }}
+            transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -left-32 bottom-[-10rem] h-[26rem] w-[26rem] rounded-full blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle at 60% 40%, rgb(var(--color-secondary)) 0%, transparent 70%)",
+            }}
+            animate={{ rotate: [0, -20, 15, 0], scale: [1, 0.9, 1.1, 1] }}
+            transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      )}
+
+      {backgroundStyle === "grid" && (
+        <div aria-hidden className="hero-grid pointer-events-none absolute inset-0" />
+      )}
+
+      {backgroundStyle === "spotlight" && (
+        <div aria-hidden className="hero-spotlight pointer-events-none absolute inset-0" />
+      )}
 
       <div className="relative mx-auto flex max-w-3xl flex-col gap-8 px-6 py-24 sm:py-32">
         {profile.avatar_url && (
@@ -87,17 +113,27 @@ export default function Hero({ profile }: { profile: Profile }) {
               Liên hệ tôi
             </a>
           )}
-          {profile.socials?.map((s) => (
-            <a
-              key={s.url}
-              href={s.url}
-              target="_blank"
-              rel="noreferrer"
-              className="font-body text-sm text-paper/70 underline-offset-4 transition hover:text-paper hover:underline"
-            >
-              {s.label}
-            </a>
-          ))}
+          {profile.socials?.map((social, socialIndex) => {
+            const href = socialHref(social);
+            if (!href) return null;
+            const platform = inferSocialPlatform(social);
+            const label = socialLabel(social);
+            const opensNewTab = href.startsWith("http");
+
+            return (
+              <a
+                key={`${platform}-${social.url}-${socialIndex}`}
+                href={href}
+                target={opensNewTab ? "_blank" : undefined}
+                rel={opensNewTab ? "noreferrer" : undefined}
+                aria-label={label}
+                className="flex items-center gap-2 rounded-full border border-paper/15 bg-paper/5 px-3.5 py-2 font-body text-sm text-paper/75 transition hover:border-paper/35 hover:bg-paper/10 hover:text-paper"
+              >
+                <SocialIcon platform={platform} />
+                <span>{label}</span>
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>
