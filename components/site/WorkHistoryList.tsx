@@ -46,7 +46,7 @@ export default function WorkHistoryList({ items }: { items: WorkHistory[] }) {
             <article key={item.id} className="relative border-l-2 border-ink/10 pb-2 pl-7">
               <span className="absolute -left-[7px] top-1.5 h-3 w-3 rounded-full bg-coral" />
               <WorkContent item={item} />
-              {(item.image_url || item.video_url) && (
+              {hasMedia && (
                 <div className="mt-4">
                   <WorkMedia item={item} />
                 </div>
