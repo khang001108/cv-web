@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Education } from "@/lib/types";
+import MediaEditor from "./MediaEditor";
 import { Field, inputClass, Card, IconButton } from "./ui";
 
 export default function EducationEditor() {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const [items, setItems] = useState<Education[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +20,7 @@ export default function EducationEditor() {
         setItems((data as Education[]) ?? []);
         setLoading(false);
       });
-  }, []);
+  }, [supabase]);
 
   function update(id: string, patch: Partial<Education>) {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
@@ -107,6 +108,13 @@ export default function EducationEditor() {
               rows={2}
               value={item.description ?? ""}
               onChange={(e) => update(item.id, { description: e.target.value })}
+            />
+          </Field>
+          <Field label="Ảnh và video">
+            <MediaEditor
+              value={item.media}
+              folder={`education/${item.id}`}
+              onChange={(media) => update(item.id, { media })}
             />
           </Field>
           <div className="flex justify-end gap-2">

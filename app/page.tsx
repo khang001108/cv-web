@@ -39,6 +39,7 @@ export default async function Home() {
     background_url: null,
     theme: "coral",
     background_style: "aurora",
+    page_layout: "classic",
     email: null,
     phone: null,
     location: null,
@@ -52,7 +53,11 @@ export default async function Home() {
   const products = (productsRes.data as Product[]) ?? [];
 
   return (
-    <main data-theme={profile.theme ?? "coral"} className="bg-paper">
+    <main
+      data-theme={profile.theme ?? "coral"}
+      data-layout={profile.page_layout ?? "classic"}
+      className="min-h-screen bg-paper"
+    >
       <Hero profile={profile} />
 
       {work.length > 0 && (
@@ -70,6 +75,7 @@ export default async function Home() {
               subtitle: e.school,
               range: formatRange(e.start_date, e.end_date),
               description: e.description,
+              media: e.media,
             }))}
           />
         </Section>

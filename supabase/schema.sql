@@ -15,6 +15,7 @@ create table if not exists profile (
   background_url text,
   theme text not null default 'coral',
   background_style text not null default 'aurora',
+  page_layout text not null default 'classic',
   email text,
   phone text,
   location text,
@@ -27,6 +28,7 @@ create table if not exists profile (
 alter table profile add column if not exists background_url text;
 alter table profile add column if not exists theme text not null default 'coral';
 alter table profile add column if not exists background_style text not null default 'aurora';
+alter table profile add column if not exists page_layout text not null default 'classic';
 
 insert into profile (id, full_name, headline, bio)
 values (1, 'Tên của bạn', 'Web Developer & Manufacturing Engineer', 'Viết mô tả bản thân ở đây.')
@@ -41,6 +43,7 @@ create table if not exists education (
   start_date date,
   end_date date,
   description text,
+  media jsonb not null default '[]'::jsonb,
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
@@ -56,6 +59,7 @@ create table if not exists work_history (
   description text,
   image_url text,
   video_url text,
+  media jsonb not null default '[]'::jsonb,
   display_layout text not null default 'timeline',
   sort_order int not null default 0,
   created_at timestamptz not null default now()
@@ -64,6 +68,7 @@ create table if not exists work_history (
 -- Bổ sung cột media/bố trí khi nâng cấp database đã tạo từ phiên bản cũ.
 alter table work_history add column if not exists image_url text;
 alter table work_history add column if not exists video_url text;
+alter table work_history add column if not exists media jsonb not null default '[]'::jsonb;
 alter table work_history add column if not exists display_layout text not null default 'timeline';
 
 -- ---------- EXPERIENCE / SKILLS (kinh nghiệm) ----------
@@ -73,6 +78,7 @@ create table if not exists experience (
   category text,
   level int check (level between 1 and 5),
   description text,
+  media jsonb not null default '[]'::jsonb,
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
@@ -87,6 +93,7 @@ create table if not exists salary_history (
   period_start date,
   period_end date,
   note text,
+  media jsonb not null default '[]'::jsonb,
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
@@ -98,11 +105,51 @@ create table if not exists products (
   description text,
   image_url text,
   video_url text,
+  media jsonb not null default '[]'::jsonb,
   link_url text,
   tags text[] not null default '{}',
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- Media dùng chung: mỗi mục có thể chứa nhiều ảnh và video.
+alter table education add column if not exists media jsonb not null default '[]'::jsonb;
+alter table experience add column if not exists media jsonb not null default '[]'::jsonb;
+alter table salary_history add column if not exists media jsonb not null default '[]'::jsonb;
+alter table products add column if not exists media jsonb not null default '[]'::jsonb;
+
+-- Chuyển ảnh/video đơn từ phiên bản cũ sang danh sách media (chỉ chạy khi danh sách còn rỗng).
+update work_history
+set media =
+  case
+    when image_url is not null and image_url <> ''
+      then jsonb_build_array(jsonb_build_object('id', gen_random_uuid()::text, 'type', 'image', 'url', image_url))
+    else '[]'::jsonb
+  end
+  ||
+  case
+    when video_url is not null and video_url <> ''
+      then jsonb_build_array(jsonb_build_object('id', gen_random_uuid()::text, 'type', 'video', 'url', video_url))
+    else '[]'::jsonb
+  end
+where media = '[]'::jsonb
+  and (coalesce(image_url, '') <> '' or coalesce(video_url, '') <> '');
+
+update products
+set media =
+  case
+    when image_url is not null and image_url <> ''
+      then jsonb_build_array(jsonb_build_object('id', gen_random_uuid()::text, 'type', 'image', 'url', image_url))
+    else '[]'::jsonb
+  end
+  ||
+  case
+    when video_url is not null and video_url <> ''
+      then jsonb_build_array(jsonb_build_object('id', gen_random_uuid()::text, 'type', 'video', 'url', video_url))
+    else '[]'::jsonb
+  end
+where media = '[]'::jsonb
+  and (coalesce(image_url, '') <> '' or coalesce(video_url, '') <> '');
 
 -- ---------- API GRANTS ----------
 -- RLS policies only filter rows; the API roles also need table privileges.

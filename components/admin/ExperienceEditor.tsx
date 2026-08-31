@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Experience } from "@/lib/types";
+import MediaEditor from "./MediaEditor";
 import { Field, inputClass, Card, IconButton } from "./ui";
 
 export default function ExperienceEditor() {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const [items, setItems] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +20,7 @@ export default function ExperienceEditor() {
         setItems((data as Experience[]) ?? []);
         setLoading(false);
       });
-  }, []);
+  }, [supabase]);
 
   function update(id: string, patch: Partial<Experience>) {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
@@ -90,6 +91,13 @@ export default function ExperienceEditor() {
               className={inputClass}
               value={item.description ?? ""}
               onChange={(e) => update(item.id, { description: e.target.value })}
+            />
+          </Field>
+          <Field label="Ảnh và video">
+            <MediaEditor
+              value={item.media}
+              folder={`experience/${item.id}`}
+              onChange={(media) => update(item.id, { media })}
             />
           </Field>
           <div className="flex justify-end gap-2">

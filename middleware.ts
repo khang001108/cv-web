@@ -27,15 +27,17 @@ export async function middleware(request: NextRequest) {
 
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
   const isAdminRoute =
     request.nextUrl.pathname.startsWith("/admin") &&
     request.nextUrl.pathname !== "/admin/login";
 
-  if (isAdminRoute && !user) {
+  if (isAdminRoute && (!user || authError)) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
+    if (authError) url.searchParams.set("expired", "1");
     return NextResponse.redirect(url);
   }
 

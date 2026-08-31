@@ -1,5 +1,6 @@
 import type {
   BackgroundStyle,
+  PageLayout,
   Social,
   SocialPlatform,
   ThemeName,
@@ -43,6 +44,17 @@ export const BACKGROUND_OPTIONS: Array<{
   { value: "grid", label: "Lưới hiện đại" },
   { value: "spotlight", label: "Đốm sáng" },
   { value: "minimal", label: "Tối giản" },
+];
+
+export const PAGE_LAYOUT_OPTIONS: Array<{
+  value: PageLayout;
+  label: string;
+  description: string;
+}> = [
+  { value: "classic", label: "Cổ điển", description: "Nội dung gọn, khoảng cách thoáng" },
+  { value: "wide", label: "Toàn cảnh", description: "Khung rộng, hợp với nhiều media" },
+  { value: "compact", label: "Gọn gàng", description: "Thu hẹp khoảng cách giữa các mục" },
+  { value: "cards", label: "Thẻ nổi", description: "Mỗi mục nằm trong một thẻ riêng" },
 ];
 
 const LABEL_TO_PLATFORM: Record<string, SocialPlatform> = {

@@ -41,8 +41,9 @@ npm run dev
   tạo ở bước 1.3)
 
 Vào `/admin` để nhập nội dung: hồ sơ, ảnh đại diện, ảnh nền, bảng màu, bối cảnh,
-mạng xã hội, học lực, công việc (ảnh, video, bố trí hiển thị), kinh nghiệm,
-sản phẩm (upload ảnh + video ngắn cho từng sản phẩm, gắn link), mức lương từng có.
+bố cục toàn trang, mạng xã hội, học lực, công việc, kinh nghiệm, sản phẩm và mức
+lương từng có. Mỗi mục nội dung có thể upload nhiều ảnh/video; riêng từng công
+việc còn có lựa chọn bố trí media riêng.
 
 ## 4. Deploy lên Vercel
 
@@ -58,11 +59,11 @@ sản phẩm (upload ảnh + video ngắn cho từng sản phẩm, gắn link), 
 | Bảng | Ứng với |
 |---|---|
 | `profile` | Mô tả bản thân, avatar, liên hệ, mạng xã hội |
-| `education` | Học lực |
-| `work_history` | Công việc, mô tả, ảnh/video và bố trí hiển thị |
-| `experience` | Kinh nghiệm / kỹ năng |
-| `salary_history` | Mức lương từng có |
-| `products` | Sản phẩm tự làm (ảnh, video, link, tag) |
+| `education` | Học lực + danh sách ảnh/video |
+| `work_history` | Công việc, mô tả, nhiều ảnh/video và bố trí hiển thị |
+| `experience` | Kinh nghiệm / kỹ năng + danh sách ảnh/video |
+| `salary_history` | Mức lương từng có + danh sách ảnh/video |
+| `products` | Sản phẩm tự làm (nhiều ảnh/video, link, tag) |
 
 Storage bucket `cv-media` chứa ảnh/video upload từ trang admin, public read.
 

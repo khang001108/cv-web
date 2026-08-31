@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { uploadToCvMedia } from "@/lib/upload";
 import type { WorkDisplayLayout, WorkHistory } from "@/lib/types";
+import { getMediaItems } from "@/lib/media";
+import MediaEditor from "./MediaEditor";
 import { Field, inputClass, Card, IconButton } from "./ui";
 
 const WORK_LAYOUTS: Array<{ value: WorkDisplayLayout; label: string }> = [
@@ -18,7 +19,6 @@ export default function WorkEditor() {
   const [items, setItems] = useState<WorkHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [uploading, setUploading] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -83,26 +83,6 @@ export default function WorkEditor() {
       return;
     }
     setItems((prev) => prev.filter((item) => item.id !== id));
-  }
-
-  async function handleUpload(
-    id: string,
-    field: "image_url" | "video_url",
-    file: File | undefined
-  ) {
-    if (!file) return;
-    const uploadKey = `${id}:${field}`;
-    setUploading(uploadKey);
-    try {
-      const folder = field === "image_url" ? "work-images" : "work-videos";
-      const url = await uploadToCvMedia(file, folder);
-      update(id, { [field]: url } as Partial<WorkHistory>);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Lỗi không xác định";
-      alert(`Tải tệp thất bại: ${message}`);
-    } finally {
-      setUploading(null);
-    }
   }
 
   if (loading) return <p className="font-body text-sm text-muted">Đang tải...</p>;
@@ -213,65 +193,15 @@ export default function WorkEditor() {
             </span>
           </Field>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Ảnh công việc">
-              <div className="flex flex-col gap-2 rounded-xl border border-ink/10 p-3">
-                {item.image_url && (
-                  <img
-                    src={item.image_url}
-                    alt="Ảnh công việc"
-                    className="aspect-video w-full rounded-lg object-cover"
-                  />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleUpload(item.id, "image_url", e.target.files?.[0])
-                  }
-                  className="font-body text-xs"
-                />
-                {uploading === `${item.id}:image_url` && (
-                  <span className="font-body text-xs text-muted">Đang tải ảnh...</span>
-                )}
-                {item.image_url && (
-                  <IconButton onClick={() => update(item.id, { image_url: null })}>
-                    Bỏ ảnh
-                  </IconButton>
-                )}
-              </div>
-            </Field>
-
-            <Field label="Video công việc">
-              <div className="flex flex-col gap-2 rounded-xl border border-ink/10 p-3">
-                {item.video_url && (
-                  <video
-                    src={item.video_url}
-                    controls
-                    playsInline
-                    preload="metadata"
-                    className="aspect-video w-full rounded-lg bg-ink object-cover"
-                  />
-                )}
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={(e) =>
-                    handleUpload(item.id, "video_url", e.target.files?.[0])
-                  }
-                  className="font-body text-xs"
-                />
-                {uploading === `${item.id}:video_url` && (
-                  <span className="font-body text-xs text-muted">Đang tải video...</span>
-                )}
-                {item.video_url && (
-                  <IconButton onClick={() => update(item.id, { video_url: null })}>
-                    Bỏ video
-                  </IconButton>
-                )}
-              </div>
-            </Field>
-          </div>
+          <Field label="Ảnh và video công việc">
+            <MediaEditor
+              value={getMediaItems(item.media, item.image_url, item.video_url)}
+              folder={`work/${item.id}`}
+              onChange={(media) =>
+                update(item.id, { media, image_url: null, video_url: null })
+              }
+            />
+          </Field>
 
           <p className="font-body text-[11px] text-muted">
             Sau khi tải ảnh/video hoặc đổi bố trí, bấm Lưu để cập nhật trang CV.

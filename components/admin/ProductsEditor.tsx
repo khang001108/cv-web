@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { uploadToCvMedia } from "@/lib/upload";
 import type { Product } from "@/lib/types";
+import { getMediaItems } from "@/lib/media";
+import MediaEditor from "./MediaEditor";
 import { Field, inputClass, Card, IconButton } from "./ui";
 
 export default function ProductsEditor() {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const [items, setItems] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
@@ -21,7 +21,7 @@ export default function ProductsEditor() {
         setItems((data as Product[]) ?? []);
         setLoading(false);
       });
-  }, []);
+  }, [supabase]);
 
   function update(id: string, patch: Partial<Product>) {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
@@ -43,23 +43,6 @@ export default function ProductsEditor() {
   async function remove(id: string) {
     await supabase.from("products").delete().eq("id", id);
     setItems((prev) => prev.filter((i) => i.id !== id));
-  }
-
-  async function handleUpload(
-    id: string,
-    field: "image_url" | "video_url",
-    file: File | undefined
-  ) {
-    if (!file) return;
-    setUploading(id + field);
-    try {
-      const url = await uploadToCvMedia(file, field === "image_url" ? "images" : "videos");
-      update(id, { [field]: url } as Partial<Product>);
-    } catch {
-      alert("Tải lên thất bại. Kiểm tra bucket 'cv-media' đã được tạo chưa.");
-    } finally {
-      setUploading(null);
-    }
   }
 
   if (loading) return <p className="font-body text-sm text-muted">Đang tải...</p>;
@@ -118,44 +101,15 @@ export default function ProductsEditor() {
             />
           </Field>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Ảnh sản phẩm">
-              <div className="flex items-center gap-3">
-                {item.image_url && (
-                  <img
-                    src={item.image_url}
-                    alt=""
-                    className="h-14 w-14 rounded-lg object-cover"
-                  />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleUpload(item.id, "image_url", e.target.files?.[0])}
-                  className="font-body text-xs"
-                />
-              </div>
-              {uploading === item.id + "image_url" && (
-                <span className="font-body text-xs text-muted">Đang tải lên...</span>
-              )}
-            </Field>
-            <Field label="Video ngắn (giới thiệu)">
-              <div className="flex items-center gap-3">
-                {item.video_url && (
-                  <video src={item.video_url} className="h-14 w-20 rounded-lg object-cover" muted />
-                )}
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={(e) => handleUpload(item.id, "video_url", e.target.files?.[0])}
-                  className="font-body text-xs"
-                />
-              </div>
-              {uploading === item.id + "video_url" && (
-                <span className="font-body text-xs text-muted">Đang tải lên...</span>
-              )}
-            </Field>
-          </div>
+          <Field label="Ảnh và video sản phẩm">
+            <MediaEditor
+              value={getMediaItems(item.media, item.image_url, item.video_url)}
+              folder={`products/${item.id}`}
+              onChange={(media) =>
+                update(item.id, { media, image_url: null, video_url: null })
+              }
+            />
+          </Field>
 
           <div className="flex justify-end gap-2">
             <IconButton variant="danger" onClick={() => remove(item.id)}>

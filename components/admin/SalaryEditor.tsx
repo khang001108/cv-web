@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { SalaryHistory } from "@/lib/types";
+import MediaEditor from "./MediaEditor";
 import { Field, inputClass, Card, IconButton } from "./ui";
 
 export default function SalaryEditor() {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const [items, setItems] = useState<SalaryHistory[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +20,7 @@ export default function SalaryEditor() {
         setItems((data as SalaryHistory[]) ?? []);
         setLoading(false);
       });
-  }, []);
+  }, [supabase]);
 
   function update(id: string, patch: Partial<SalaryHistory>) {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
@@ -101,6 +102,13 @@ export default function SalaryEditor() {
               className={inputClass}
               value={item.note ?? ""}
               onChange={(e) => update(item.id, { note: e.target.value })}
+            />
+          </Field>
+          <Field label="Ảnh và video">
+            <MediaEditor
+              value={item.media}
+              folder={`salary/${item.id}`}
+              onChange={(media) => update(item.id, { media })}
             />
           </Field>
           <div className="flex justify-end gap-2">

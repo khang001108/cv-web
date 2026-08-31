@@ -3,10 +3,18 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { uploadToCvMedia } from "@/lib/upload";
-import type { BackgroundStyle, Profile, Social, SocialPlatform, ThemeName } from "@/lib/types";
+import type {
+  BackgroundStyle,
+  PageLayout,
+  Profile,
+  Social,
+  SocialPlatform,
+  ThemeName,
+} from "@/lib/types";
 import {
   BACKGROUND_OPTIONS,
   inferSocialPlatform,
+  PAGE_LAYOUT_OPTIONS,
   SOCIAL_OPTIONS,
   socialHref,
   THEME_OPTIONS,
@@ -132,6 +140,7 @@ export default function ProfileEditor() {
 
   const selectedTheme = profile.theme ?? "coral";
   const selectedBackground = profile.background_style ?? "aurora";
+  const selectedPageLayout = profile.page_layout ?? "classic";
 
   return (
     <Card>
@@ -254,6 +263,39 @@ export default function ProfileEditor() {
                 ))}
               </span>
               <span className="font-body text-xs font-medium text-ink">{theme.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <div className="h-px bg-ink/10" />
+
+      <section className="flex flex-col gap-3">
+        <div>
+          <h2 className="font-display text-lg font-medium text-ink">Bố cục toàn trang</h2>
+          <p className="font-body text-xs text-muted">
+            Thay đổi độ rộng, khoảng cách và cách đóng khung các mục trên trang CV.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {PAGE_LAYOUT_OPTIONS.map((layout) => (
+            <button
+              key={layout.value}
+              type="button"
+              aria-pressed={selectedPageLayout === layout.value}
+              onClick={() => update({ page_layout: layout.value as PageLayout })}
+              className={`rounded-xl border p-3 text-left transition ${
+                selectedPageLayout === layout.value
+                  ? "border-coral bg-coral/5"
+                  : "border-ink/10 hover:border-ink/25"
+              }`}
+            >
+              <span className="block font-body text-sm font-medium text-ink">
+                {layout.label}
+              </span>
+              <span className="mt-1 block font-body text-xs text-muted">
+                {layout.description}
+              </span>
             </button>
           ))}
         </div>

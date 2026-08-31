@@ -67,7 +67,7 @@ export default function Hero({ profile }: { profile: Profile }) {
         <div aria-hidden className="hero-spotlight pointer-events-none absolute inset-0" />
       )}
 
-      <div className="relative mx-auto flex max-w-3xl flex-col gap-8 px-6 py-24 sm:py-32">
+      <div className="hero-inner relative mx-auto flex max-w-3xl flex-col gap-8 px-6 py-24 sm:py-32">
         {profile.avatar_url && (
           <img
             src={profile.avatar_url}

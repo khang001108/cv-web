@@ -17,6 +17,14 @@ export type ThemeName = "coral" | "ocean" | "forest" | "sunset";
 
 export type BackgroundStyle = "aurora" | "grid" | "spotlight" | "minimal";
 
+export type PageLayout = "classic" | "wide" | "compact" | "cards";
+
+export type MediaItem = {
+  id: string;
+  type: "image" | "video";
+  url: string;
+};
+
 export type WorkDisplayLayout =
   | "timeline"
   | "media-left"
@@ -38,6 +46,7 @@ export type Profile = {
   background_url: string | null;
   theme: ThemeName;
   background_style: BackgroundStyle;
+  page_layout: PageLayout;
   email: string | null;
   phone: string | null;
   location: string | null;
@@ -53,6 +62,7 @@ export type Education = {
   start_date: string | null;
   end_date: string | null;
   description: string | null;
+  media: MediaItem[];
   sort_order: number;
 };
 
@@ -66,6 +76,7 @@ export type WorkHistory = {
   description: string | null;
   image_url: string | null;
   video_url: string | null;
+  media: MediaItem[];
   display_layout: WorkDisplayLayout;
   sort_order: number;
 };
@@ -76,6 +87,7 @@ export type Experience = {
   category: string | null;
   level: number | null;
   description: string | null;
+  media: MediaItem[];
   sort_order: number;
 };
 
@@ -88,6 +100,7 @@ export type SalaryHistory = {
   period_start: string | null;
   period_end: string | null;
   note: string | null;
+  media: MediaItem[];
   sort_order: number;
 };
 
@@ -97,6 +110,7 @@ export type Product = {
   description: string | null;
   image_url: string | null;
   video_url: string | null;
+  media: MediaItem[];
   link_url: string | null;
   tags: string[];
   sort_order: number;

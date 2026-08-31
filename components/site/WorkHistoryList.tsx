@@ -1,28 +1,14 @@
 import type { WorkHistory, WorkDisplayLayout } from "@/lib/types";
 import { formatRange } from "@/lib/format";
+import { getMediaItems } from "@/lib/media";
+import MediaGallery from "./MediaGallery";
 
 function WorkMedia({ item }: { item: WorkHistory }) {
-  if (!item.image_url && !item.video_url) return null;
-
   return (
-    <div className="grid min-w-0 grid-cols-1 gap-2">
-      {item.image_url && (
-        <img
-          src={item.image_url}
-          alt={`${item.position} tại ${item.company}`}
-          className="aspect-video h-full w-full rounded-xl object-cover"
-        />
-      )}
-      {item.video_url && (
-        <video
-          src={item.video_url}
-          controls
-          playsInline
-          preload="metadata"
-          className="aspect-video h-full w-full rounded-xl bg-ink object-cover"
-        />
-      )}
-    </div>
+    <MediaGallery
+      items={getMediaItems(item.media, item.image_url, item.video_url)}
+      variant="grid"
+    />
   );
 }
 
@@ -53,7 +39,7 @@ export default function WorkHistoryList({ items }: { items: WorkHistory[] }) {
     <div className="flex flex-col gap-8">
       {items.map((item) => {
         const layout = layoutOf(item);
-        const hasMedia = Boolean(item.image_url || item.video_url);
+        const hasMedia = getMediaItems(item.media, item.image_url, item.video_url).length > 0;
 
         if (layout === "timeline" || !hasMedia) {
           return (

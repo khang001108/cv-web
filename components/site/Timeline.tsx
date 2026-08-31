@@ -1,4 +1,6 @@
 import { formatRange } from "@/lib/format";
+import type { MediaItem } from "@/lib/types";
+import MediaGallery from "./MediaGallery";
 
 export type TimelineEntry = {
   id: string;
@@ -6,6 +8,7 @@ export type TimelineEntry = {
   subtitle: string;
   range: string;
   description?: string | null;
+  media?: MediaItem[];
 };
 
 export function Timeline({ entries }: { entries: TimelineEntry[] }) {
@@ -32,6 +35,11 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
             <p className="mt-2 max-w-xl whitespace-pre-line font-body text-sm leading-relaxed text-muted">
               {e.description}
             </p>
+          )}
+          {e.media && e.media.length > 0 && (
+            <div className="mt-4">
+              <MediaGallery items={e.media} variant="compact" />
+            </div>
           )}
         </li>
       ))}

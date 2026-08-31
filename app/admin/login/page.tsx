@@ -1,15 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [expired, setExpired] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setExpired(new URLSearchParams(window.location.search).get("expired") === "1");
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,6 +40,11 @@ export default function LoginPage() {
         <h1 className="mb-6 font-display text-2xl font-medium text-paper">
           Đăng nhập Admin
         </h1>
+        {expired && (
+          <p className="mb-4 rounded-lg border border-coral/30 bg-coral/10 p-3 font-body text-sm text-paper/80">
+            Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.
+          </p>
+        )}
         <div className="flex flex-col gap-4">
           <input
             type="email"
