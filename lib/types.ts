@@ -30,6 +30,8 @@ export type MediaItem = {
   id: string;
   type: "image" | "video";
   url: string;
+  start_time?: number;
+  end_time?: number;
 };
 
 export type WorkDisplayLayout =

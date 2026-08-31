@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
+  type SyntheticEvent,
   type WheelEvent as ReactWheelEvent,
 } from "react";
 import { createPortal } from "react-dom";
@@ -140,6 +141,32 @@ export default function MediaGallery({
     }
   }
 
+  function setVideoToClipStart(
+    event: SyntheticEvent<HTMLVideoElement>,
+    item: MediaItem
+  ) {
+    const video = event.currentTarget;
+    const start = Math.max(0, item.start_time ?? 0);
+    const end = item.end_time;
+    if (video.currentTime < start || (end != null && video.currentTime >= end)) {
+      video.currentTime = start;
+    }
+  }
+
+  function keepVideoInsideClip(
+    event: SyntheticEvent<HTMLVideoElement>,
+    item: MediaItem
+  ) {
+    const video = event.currentTarget;
+    const start = Math.max(0, item.start_time ?? 0);
+    const end = item.end_time;
+    if (video.currentTime < start - 0.15) video.currentTime = start;
+    if (end != null && video.currentTime >= end) {
+      video.pause();
+      video.currentTime = start;
+    }
+  }
+
   const lightbox =
     mounted && selectedIndex !== null && selected
       ? createPortal(
@@ -220,6 +247,10 @@ export default function MediaGallery({
                   controls
                   autoPlay
                   playsInline
+                  onLoadedMetadata={(event) => setVideoToClipStart(event, selected)}
+                  onPlay={(event) => setVideoToClipStart(event, selected)}
+                  onSeeking={(event) => keepVideoInsideClip(event, selected)}
+                  onTimeUpdate={(event) => keepVideoInsideClip(event, selected)}
                   className="max-h-full max-w-full rounded-lg bg-black object-contain"
                 />
               )}
@@ -288,6 +319,7 @@ export default function MediaGallery({
                   muted
                   playsInline
                   preload="metadata"
+                  onLoadedMetadata={(event) => setVideoToClipStart(event, item)}
                   className="pointer-events-none h-full w-full bg-ink object-cover"
                 />
                 <span className="absolute inset-0 flex items-center justify-center bg-black/20 transition group-hover:bg-black/35">
@@ -295,6 +327,11 @@ export default function MediaGallery({
                     <Play className="h-6 w-6 fill-current" />
                   </span>
                 </span>
+                {(item.start_time != null || item.end_time != null) && (
+                  <span className="absolute bottom-2 left-2 rounded-full bg-black/65 px-2 py-1 font-body text-[10px] text-white">
+                    Đã cắt
+                  </span>
+                )}
               </>
             )}
             {item.type === "image" && (
